@@ -55,8 +55,13 @@ img, video {
 
 <script type="module">
 
-import { FFmpeg } from "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/+esm";
-import { fetchFile, toBlobURL } from "https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/+esm";
+const base = "/mp4towebpvideo/ffmpeg";
+
+await ffmpeg.load({
+  coreURL: `${base}/ffmpeg-core.js`,
+  wasmURL: `${base}/ffmpeg-core.wasm`,
+});
+
 
 const status = document.getElementById("status");
 const fileInput = document.getElementById("fileInput");
