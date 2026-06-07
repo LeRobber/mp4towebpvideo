@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MP4 → Animated WebP</title>
+
+<style>
+body {
+    font-family: system-ui, sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+#status {
+    margin: 15px 0;
+    font-weight: bold;
+}
+
+img, video {
+    max-width: 100%;
+    margin-top: 20px;
+    border: 1px solid #ccc;
+}
+
+#download {
+    display: none;
+    margin-top: 20px;
+}
+</style>
+</head>
+<body>
+
+<h1>MP4 → Animated WebP Converter</h1>
+
+<input id="fileInput" type="file" accept="video/mp4">
+<button id="convertBtn">Convert</button>
+
+<div id="status">Ready</div>
+
+<h3>Source Video</h3>
+<video id="videoPreview" controls></video>
+
+<h3>Animated WebP</h3>
+<img id="webpPreview">
+
+<br>
+<a id="download">Download WebP</a>
+
+<script type="module">
+
+import { FFmpeg } from "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/+esm";
+import { fetchFile, toBlobURL } from "https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/+esm";
+
+const status = document.getElementById("status");
+const fileInput = document.getElementById("fileInput");
+const convertBtn = document.getElementById("convertBtn");
+const videoPreview = document.getElementById("videoPreview");
+const webpPreview = document.getElementById("webpPreview");
+const download = document.getElementById("download");
+
+let ffmpeg = null;
+let loaded = false;
+
+async function loadFFmpeg() {
+
+    if (loaded) return;
+
+    status.textContent = "Loading FFmpeg (~30MB)...";
+
+    ffmpeg = new FFmpeg();
+
+    ffmpeg.on("log", ({ message }) => {
+        console.log(message);
+    });
+
+    ffmpeg.on("progress", ({ progress }) => {
+        status.textContent =
+            `Converting ${(progress * 100).toFixed(0)}%`;
+    });
+
+    const baseURL =
+        "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm";
+
+    await ffmpeg.load({
+        coreURL: await toBlobURL(
+            `${baseURL}/ffmpeg-core.js`,
+            "text/javascript"
+        ),
+        wasmURL: await toBlobURL(
+            `${baseURL}/ffmpeg-core.wasm`,
+            "application/wasm"
+        )
+    });
+
+    loaded = true;
+
+    status.textContent = "FFmpeg loaded";
+}
+
+fileInput.addEventListener("change", () => {
+
+    const file = fileInput.files[0];
+
+    if (!file) return;
+
+    videoPreview.src = URL.createObjectURL(file);
+});
+
+convertBtn.addEventListener("click", async () => {
+
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert("Choose an MP4 first.");
+        return;
+    }
+
+    try {
+
+        await loadFFmpeg();
+
+        status.textContent = "Uploading video...";
+
+        await ffmpeg.writeFile(
+            "input.mp4",
+            await fetchFile(file)
+        );
+
+        status.textContent = "Running FFmpeg...";
+
+        await ffmpeg.exec([
+            "-i",
+            "input.mp4",
+
+            "-vf",
+            "fps=12,scale=480:-1:flags=lanczos",
+
+            "-loop",
+            "0",
+
+            "-quality",
+            "75",
+
+            "output.webp"
+        ]);
+
+        status.textContent = "Reading output...";
+
+        const data =
+            await ffmpeg.readFile("output.webp");
+
+        const blob = new Blob(
+            [data],
+            { type: "image/webp" }
+        );
+
+        const url =
+            URL.createObjectURL(blob);
+
+        webpPreview.src = url;
+
+        download.href = url;
+        download.download = "output.webp";
+        download.style.display = "inline-block";
+
+        status.textContent =
+            `Done (${Math.round(blob.size / 1024)} KB)`;
+
+    } catch (err) {
+
+        console.error(err);
+
+        status.textContent =
+            "ERROR: " + err.message;
+
+        alert(err.message);
+    }
+});
+</script>
+
+</body>
+</html>
