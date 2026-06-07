@@ -55,9 +55,8 @@ img, video {
 <a id="download">Download WebP</a>
 
 <script type="module">
-import { FFmpeg } from "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/+esm";
-import { fetchFile } from "https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/+esm";
-
+import { FFmpeg } from "./ffmpeg/ffmpeg.js";
+import { fetchFile } from "./ffmpeg/util.js";
 const status = document.getElementById("status");
 const fileInput = document.getElementById("fileInput");
 const convertBtn = document.getElementById("convertBtn");
