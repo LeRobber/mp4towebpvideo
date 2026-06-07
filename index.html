@@ -56,7 +56,7 @@ img, video {
 <script type="module">
 
 const base = "/mp4towebpvideo/ffmpeg";
-
+let ffmpeg = null;
 await ffmpeg.load({
   coreURL: `${base}/ffmpeg-core.js`,
   wasmURL: `${base}/ffmpeg-core.wasm`,
@@ -70,7 +70,7 @@ const videoPreview = document.getElementById("videoPreview");
 const webpPreview = document.getElementById("webpPreview");
 const download = document.getElementById("download");
 
-let ffmpeg = null;
+;
 let loaded = false;
 
 async function loadFFmpeg() {
