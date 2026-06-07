@@ -76,8 +76,9 @@ async function loadFFmpeg() {
     status.textContent = "Loading FFmpeg...";
 
     await ffmpeg.load({
-        coreURL: `${basePath}/ffmpeg-core.js`,
-        wasmURL: `${basePath}/ffmpeg-core.wasm`
+      coreURL: "./ffmpeg/ffmpeg-core.js",
+      wasmURL: "./ffmpeg/ffmpeg-core.wasm",
+      workerURL: "./ffmpeg/worker.js"
     });
 
     ffmpeg.on("log", ({ message }) => {
