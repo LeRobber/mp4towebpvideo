@@ -35,6 +35,7 @@ img, video {
 }
 </style>
 </head>
+
 <body>
 
 <h1>MP4 → Animated WebP Converter</h1>
@@ -54,14 +55,8 @@ img, video {
 <a id="download">Download WebP</a>
 
 <script type="module">
-
-const base = "/mp4towebpvideo/ffmpeg";
-let ffmpeg = null;
-await ffmpeg.load({
-  coreURL: `${base}/ffmpeg-core.js`,
-  wasmURL: `${base}/ffmpeg-core.wasm`,
-});
-
+import { FFmpeg } from "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/+esm";
+import { fetchFile } from "https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/+esm";
 
 const status = document.getElementById("status");
 const fileInput = document.getElementById("fileInput");
@@ -70,16 +65,21 @@ const videoPreview = document.getElementById("videoPreview");
 const webpPreview = document.getElementById("webpPreview");
 const download = document.getElementById("download");
 
-;
+const ffmpeg = new FFmpeg();
+
+const basePath = "/mp4towebpvideo/ffmpeg";
+
 let loaded = false;
 
 async function loadFFmpeg() {
-
     if (loaded) return;
 
-    status.textContent = "Loading FFmpeg (~30MB)...";
+    status.textContent = "Loading FFmpeg...";
 
-    ffmpeg = new FFmpeg();
+    await ffmpeg.load({
+        coreURL: `${basePath}/ffmpeg-core.js`,
+        wasmURL: `${basePath}/ffmpeg-core.wasm`
+    });
 
     ffmpeg.on("log", ({ message }) => {
         console.log(message);
@@ -90,36 +90,17 @@ async function loadFFmpeg() {
             `Converting ${(progress * 100).toFixed(0)}%`;
     });
 
-    const baseURL =
-        "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm";
-
-    await ffmpeg.load({
-        coreURL: await toBlobURL(
-            `${baseURL}/ffmpeg-core.js`,
-            "text/javascript"
-        ),
-        wasmURL: await toBlobURL(
-            `${baseURL}/ffmpeg-core.wasm`,
-            "application/wasm"
-        )
-    });
-
     loaded = true;
-
     status.textContent = "FFmpeg loaded";
 }
 
 fileInput.addEventListener("change", () => {
-
     const file = fileInput.files[0];
-
     if (!file) return;
-
     videoPreview.src = URL.createObjectURL(file);
 });
 
 convertBtn.addEventListener("click", async () => {
-
     const file = fileInput.files[0];
 
     if (!file) {
@@ -128,46 +109,31 @@ convertBtn.addEventListener("click", async () => {
     }
 
     try {
-
         await loadFFmpeg();
 
-        status.textContent = "Uploading video...";
+        status.textContent = "Loading file...";
 
         await ffmpeg.writeFile(
             "input.mp4",
             await fetchFile(file)
         );
 
-        status.textContent = "Running FFmpeg...";
+        status.textContent = "Converting...";
 
         await ffmpeg.exec([
-            "-i",
-            "input.mp4",
-
-            "-vf",
-            "fps=12,scale=480:-1:flags=lanczos",
-
-            "-loop",
-            "0",
-
-            "-quality",
-            "75",
-
+            "-i", "input.mp4",
+            "-vf", "fps=12,scale=480:-1:flags=lanczos",
+            "-loop", "0",
+            "-quality", "75",
             "output.webp"
         ]);
 
         status.textContent = "Reading output...";
 
-        const data =
-            await ffmpeg.readFile("output.webp");
+        const data = await ffmpeg.readFile("output.webp");
 
-        const blob = new Blob(
-            [data],
-            { type: "image/webp" }
-        );
-
-        const url =
-            URL.createObjectURL(blob);
+        const blob = new Blob([data], { type: "image/webp" });
+        const url = URL.createObjectURL(blob);
 
         webpPreview.src = url;
 
@@ -179,12 +145,8 @@ convertBtn.addEventListener("click", async () => {
             `Done (${Math.round(blob.size / 1024)} KB)`;
 
     } catch (err) {
-
         console.error(err);
-
-        status.textContent =
-            "ERROR: " + err.message;
-
+        status.textContent = "ERROR: " + err.message;
         alert(err.message);
     }
 });
