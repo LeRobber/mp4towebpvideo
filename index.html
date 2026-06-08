@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MP4 to WebP Converter</title>
+    <title>MP4 to Animated WebP Converter</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,8 +12,8 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
             min-height: 100vh;
             padding: 20px;
             color: #fff;
@@ -26,54 +26,51 @@
 
         h1 {
             text-align: center;
-            margin-bottom: 10px;
-            font-size: 2.5rem;
-            background: linear-gradient(90deg, #e94560, #ff6b6b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            margin-bottom: 8px;
+            font-size: 2rem;
+            color: #00d4ff;
         }
 
         .subtitle {
             text-align: center;
-            color: #888;
-            margin-bottom: 30px;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
         }
 
         .upload-area {
-            border: 3px dashed #e94560;
-            border-radius: 20px;
-            padding: 60px 20px;
+            border: 2px dashed #00d4ff;
+            border-radius: 16px;
+            padding: 50px 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: rgba(233, 69, 96, 0.1);
+            background: rgba(0, 212, 255, 0.05);
             margin-bottom: 20px;
         }
 
         .upload-area:hover {
-            background: rgba(233, 69, 96, 0.2);
-            transform: scale(1.02);
+            background: rgba(0, 212, 255, 0.1);
         }
 
         .upload-area.dragover {
-            background: rgba(233, 69, 96, 0.3);
-            border-color: #ff6b6b;
+            background: rgba(0, 212, 255, 0.15);
+            border-color: #00ff88;
         }
 
         .upload-icon {
-            font-size: 4rem;
-            margin-bottom: 15px;
+            font-size: 3.5rem;
+            margin-bottom: 12px;
         }
 
         .upload-text {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
         }
 
         .upload-hint {
-            color: #888;
-            font-size: 0.9rem;
+            color: #666;
+            font-size: 0.85rem;
         }
 
         #fileInput {
@@ -81,61 +78,72 @@
         }
 
         .settings {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 25px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
             margin-bottom: 20px;
         }
 
         .settings h3 {
-            margin-bottom: 20px;
-            color: #e94560;
+            margin-bottom: 15px;
+            color: #00d4ff;
+            font-size: 1rem;
         }
 
         .setting-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
         }
 
         .setting-group {
-            flex: 1;
-            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
         .setting-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #ccc;
+            font-size: 0.85rem;
+            color: #aaa;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .setting-group label span {
+            color: #00d4ff;
+            font-weight: 600;
         }
 
         .setting-group input[type="range"] {
             width: 100%;
-            accent-color: #e94560;
+            accent-color: #00d4ff;
+            background: #333;
+            border-radius: 4px;
+            height: 6px;
         }
 
         .setting-group input[type="number"] {
             width: 100%;
-            padding: 10px;
+            padding: 8px 10px;
             border: 1px solid #333;
-            border-radius: 8px;
+            border-radius: 6px;
             background: #1a1a2e;
             color: #fff;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
-        .setting-value {
-            text-align: right;
-            color: #e94560;
-            font-weight: bold;
+        .setting-group input[type="number"]:focus {
+            outline: none;
+            border-color: #00d4ff;
         }
 
         .preview-section {
             display: none;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 25px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
             margin-bottom: 20px;
         }
 
@@ -144,53 +152,51 @@
         }
 
         .preview-section h3 {
-            margin-bottom: 20px;
-            color: #e94560;
+            margin-bottom: 15px;
+            color: #00d4ff;
+            font-size: 1rem;
         }
 
         .preview-container {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            justify-content: center;
-        }
-
-        .preview-box {
-            flex: 1;
-            min-width: 280px;
-            max-width: 400px;
         }
 
         .preview-box h4 {
-            margin-bottom: 10px;
-            color: #ccc;
+            margin-bottom: 8px;
+            color: #888;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
 
         .preview-box video,
         .preview-box img {
             width: 100%;
-            border-radius: 10px;
+            border-radius: 8px;
             background: #000;
+            display: block;
         }
 
         .file-info {
-            margin-top: 10px;
+            margin-top: 8px;
             padding: 10px;
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            font-size: 0.85rem;
-            color: #aaa;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #888;
+            line-height: 1.5;
         }
 
         .convert-btn {
             width: 100%;
-            padding: 18px;
-            font-size: 1.2rem;
-            font-weight: bold;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
             border: none;
-            border-radius: 12px;
-            background: linear-gradient(90deg, #e94560, #ff6b6b);
-            color: #fff;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            color: #000;
             cursor: pointer;
             transition: all 0.3s ease;
             margin-bottom: 20px;
@@ -198,19 +204,21 @@
 
         .convert-btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
         }
 
         .convert-btn:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
+            transform: none;
         }
 
         .progress-section {
             display: none;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 25px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
             margin-bottom: 20px;
         }
 
@@ -219,36 +227,39 @@
         }
 
         .progress-bar {
-            height: 30px;
+            height: 24px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
+            border-radius: 12px;
             overflow: hidden;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #e94560, #ff6b6b);
-            border-radius: 15px;
-            transition: width 0.3s ease;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            border-radius: 12px;
+            transition: width 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 0.9rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #000;
+            min-width: 40px;
         }
 
         .progress-status {
             text-align: center;
-            color: #ccc;
+            color: #888;
+            font-size: 0.9rem;
         }
 
         .download-section {
             display: none;
-            background: rgba(39, 174, 96, 0.1);
-            border: 2px solid #27ae60;
-            border-radius: 15px;
-            padding: 25px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 12px;
+            padding: 20px;
             text-align: center;
         }
 
@@ -256,140 +267,384 @@
             display: block;
         }
 
+        .download-section h3 {
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
         .download-btn {
-            padding: 15px 40px;
-            font-size: 1.1rem;
-            font-weight: bold;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
             border: none;
-            border-radius: 10px;
-            background: #27ae60;
-            color: #fff;
+            border-radius: 8px;
+            background: #00ff88;
+            color: #000;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 15px;
+            margin-top: 12px;
         }
 
         .download-btn:hover {
-            background: #2ecc71;
+            background: #00ffaa;
             transform: translateY(-2px);
         }
 
         .error-message {
             display: none;
-            background: rgba(231, 76, 60, 0.2);
-            border: 1px solid #e74c3c;
-            border-radius: 10px;
-            padding: 15px;
+            background: rgba(255, 68, 68, 0.15);
+            border: 1px solid #ff4444;
+            border-radius: 8px;
+            padding: 12px 15px;
             margin-bottom: 20px;
-            color: #e74c3c;
+            color: #ff6b6b;
+            font-size: 0.9rem;
         }
 
         .error-message.active {
             display: block;
         }
 
-        .info-box {
-            background: rgba(52, 152, 219, 0.1);
-            border: 1px solid #3498db;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            color: #3498db;
+        .loading-lib {
+            text-align: center;
+            padding: 40px;
+            color: #666;
         }
 
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 1.8rem;
-            }
+        .loading-lib .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #333;
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
 
-            .upload-area {
-                padding: 40px 15px;
-            }
-
-            .upload-icon {
-                font-size: 3rem;
-            }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎬 MP4 to WebP Converter</h1>
-        <p class="subtitle">Convert short videos to animated WebP - 100% in your browser</p>
+        <h1>🎬 MP4 to Animated WebP</h1>
+        <p class="subtitle">Convert videos to animated WebP files entirely in your browser</p>
 
-        <div class="info-box">
-            ℹ️ This tool works entirely in your browser. No files are uploaded to any server. 
-            Maximum video length: 8 seconds. For best results, use small resolution videos.
+        <div class="loading-lib" id="loadingLib">
+            <div class="spinner"></div>
+            <p>Loading WebP encoder...</p>
         </div>
 
-        <div class="error-message" id="errorMessage"></div>
+        <div id="mainContent" style="display: none;">
+            <div class="error-message" id="errorMessage"></div>
 
-        <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">📁</div>
-            <div class="upload-text">Drop your MP4 file here or click to browse</div>
-            <div class="upload-hint">Maximum 8 seconds, recommended under 720p</div>
-            <input type="file" id="fileInput" accept="video/mp4,video/webm,video/ogg">
-        </div>
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">🎥</div>
+                <div class="upload-text">Drop MP4 file here or click to browse</div>
+                <div class="upload-hint">Max 8 seconds • Recommended: 720p or smaller</div>
+                <input type="file" id="fileInput" accept="video/mp4,video/webm,video/ogg,video/*">
+            </div>
 
-        <div class="settings">
-            <h3>⚙️ Conversion Settings</h3>
-            <div class="setting-row">
-                <div class="setting-group">
-                    <label>Quality: <span class="setting-value" id="qualityValue">80%</span></label>
-                    <input type="range" id="quality" min="10" max="100" value="80">
-                </div>
-                <div class="setting-group">
-                    <label>Frame Rate (FPS): <span class="setting-value" id="fpsValue">15</span></label>
-                    <input type="range" id="fps" min="5" max="30" value="15">
+            <div class="settings">
+                <h3>⚙️ Settings</h3>
+                <div class="setting-row">
+                    <div class="setting-group">
+                        <label>Quality <span id="qualityValue">75%</span></label>
+                        <input type="range" id="quality" min="10" max="100" value="75">
+                    </div>
+                    <div class="setting-group">
+                        <label>FPS <span id="fpsValue">12</span></label>
+                        <input type="range" id="fps" min="4" max="24" value="12">
+                    </div>
+                    <div class="setting-group">
+                        <label>Max Width</label>
+                        <input type="number" id="maxWidth" value="400" min="50" max="1920">
+                    </div>
+                    <div class="setting-group">
+                        <label>Max Height</label>
+                        <input type="number" id="maxHeight" value="400" min="50" max="1080">
+                    </div>
                 </div>
             </div>
-            <div class="setting-row">
-                <div class="setting-group">
-                    <label>Max Width (px):</label>
-                    <input type="number" id="maxWidth" value="480" min="100" max="1920">
-                </div>
-                <div class="setting-group">
-                    <label>Max Height (px):</label>
-                    <input type="number" id="maxHeight" value="480" min="100" max="1080">
-                </div>
-            </div>
-        </div>
 
-        <div class="preview-section" id="previewSection">
-            <h3>👀 Preview</h3>
-            <div class="preview-container">
-                <div class="preview-box">
-                    <h4>Original Video</h4>
-                    <video id="videoPreview" controls muted></video>
-                    <div class="file-info" id="videoInfo"></div>
-                </div>
-                <div class="preview-box" id="webpPreviewBox" style="display: none;">
-                    <h4>Converted WebP</h4>
-                    <img id="webpPreview" alt="Converted WebP">
-                    <div class="file-info" id="webpInfo"></div>
+            <div class="preview-section" id="previewSection">
+                <h3>📺 Preview</h3>
+                <div class="preview-container">
+                    <div class="preview-box">
+                        <h4>Original Video</h4>
+                        <video id="videoPreview" controls muted playsinline></video>
+                        <div class="file-info" id="videoInfo"></div>
+                    </div>
+                    <div class="preview-box" id="webpPreviewBox" style="display: none;">
+                        <h4>Animated WebP Output</h4>
+                        <img id="webpPreview" alt="Animated WebP">
+                        <div class="file-info" id="webpInfo"></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <button class="convert-btn" id="convertBtn" disabled>🚀 Convert to WebP</button>
+            <button class="convert-btn" id="convertBtn" disabled>🚀 Convert to Animated WebP</button>
 
-        <div class="progress-section" id="progressSection">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+            <div class="progress-section" id="progressSection">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+                </div>
+                <div class="progress-status" id="progressStatus">Initializing...</div>
             </div>
-            <div class="progress-status" id="progressStatus">Preparing...</div>
-        </div>
 
-        <div class="download-section" id="downloadSection">
-            <h3>✅ Conversion Complete!</h3>
-            <p id="conversionStats"></p>
-            <button class="download-btn" id="downloadBtn">💾 Download WebP</button>
+            <div class="download-section" id="downloadSection">
+                <h3>✅ Conversion Complete!</h3>
+                <p id="conversionStats"></p>
+                <button class="download-btn" id="downloadBtn">💾 Download Animated WebP</button>
+            </div>
         </div>
     </div>
 
+    <!-- Load gif.js for creating animated images - we'll convert GIF to WebP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+    
     <script>
+        // WebP Encoder using manual RIFF/WebP construction
+        class AnimatedWebPEncoder {
+            constructor(width, height, options = {}) {
+                this.width = width;
+                this.height = height;
+                this.quality = options.quality || 0.75;
+                this.frames = [];
+            }
+
+            addFrame(canvas, delay) {
+                // Get WebP data for this frame
+                const dataUrl = canvas.toDataURL('image/webp', this.quality);
+                const base64 = dataUrl.split(',')[1];
+                const binary = atob(base64);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) {
+                    bytes[i] = binary.charCodeAt(i);
+                }
+                
+                this.frames.push({
+                    data: bytes,
+                    delay: delay
+                });
+            }
+
+            async render() {
+                // For animated WebP, we need to construct an RIFF container
+                // with ANIM and ANMF chunks
+                
+                if (this.frames.length === 0) {
+                    throw new Error('No frames added');
+                }
+
+                if (this.frames.length === 1) {
+                    // Single frame, just return the WebP data
+                    return new Blob([this.frames[0].data], { type: 'image/webp' });
+                }
+
+                // Build animated WebP
+                return this.buildAnimatedWebP();
+            }
+
+            buildAnimatedWebP() {
+                // Extract VP8/VP8L data from each frame's WebP
+                const frameChunks = this.frames.map((frame, index) => {
+                    return this.createANMFChunk(frame.data, frame.delay, index === 0);
+                });
+
+                // Calculate total size
+                const animChunk = this.createANIMChunk();
+                let totalSize = 4 + animChunk.length; // WEBP + ANIM
+                
+                // Add VP8X chunk
+                const vp8xChunk = this.createVP8XChunk();
+                totalSize += vp8xChunk.length;
+
+                for (const chunk of frameChunks) {
+                    totalSize += chunk.length;
+                }
+
+                // Build the file
+                const buffer = new ArrayBuffer(12 + totalSize);
+                const view = new DataView(buffer);
+                const bytes = new Uint8Array(buffer);
+
+                let offset = 0;
+
+                // RIFF header
+                bytes.set([0x52, 0x49, 0x46, 0x46], offset); // "RIFF"
+                offset += 4;
+                view.setUint32(offset, totalSize + 4, true); // File size - 8
+                offset += 4;
+                bytes.set([0x57, 0x45, 0x42, 0x50], offset); // "WEBP"
+                offset += 4;
+
+                // VP8X chunk (extended features)
+                bytes.set(vp8xChunk, offset);
+                offset += vp8xChunk.length;
+
+                // ANIM chunk
+                bytes.set(animChunk, offset);
+                offset += animChunk.length;
+
+                // ANMF chunks (frames)
+                for (const chunk of frameChunks) {
+                    bytes.set(chunk, offset);
+                    offset += chunk.length;
+                }
+
+                return new Blob([buffer], { type: 'image/webp' });
+            }
+
+            createVP8XChunk() {
+                const chunk = new Uint8Array(18);
+                const view = new DataView(chunk.buffer);
+
+                // "VP8X"
+                chunk.set([0x56, 0x50, 0x38, 0x58], 0);
+                // Chunk size (10 bytes)
+                view.setUint32(4, 10, true);
+                // Flags: animation bit set (bit 1)
+                chunk[8] = 0x02;
+                // Reserved
+                chunk[9] = 0;
+                chunk[10] = 0;
+                chunk[11] = 0;
+                // Canvas width - 1 (24 bits)
+                const w = this.width - 1;
+                chunk[12] = w & 0xFF;
+                chunk[13] = (w >> 8) & 0xFF;
+                chunk[14] = (w >> 16) & 0xFF;
+                // Canvas height - 1 (24 bits)
+                const h = this.height - 1;
+                chunk[15] = h & 0xFF;
+                chunk[16] = (h >> 8) & 0xFF;
+                chunk[17] = (h >> 16) & 0xFF;
+
+                return chunk;
+            }
+
+            createANIMChunk() {
+                const chunk = new Uint8Array(14);
+                const view = new DataView(chunk.buffer);
+
+                // "ANIM"
+                chunk.set([0x41, 0x4E, 0x49, 0x4D], 0);
+                // Chunk size (6 bytes)
+                view.setUint32(4, 6, true);
+                // Background color (BGRA)
+                chunk[8] = 0xFF; // B
+                chunk[9] = 0xFF; // G
+                chunk[10] = 0xFF; // R
+                chunk[11] = 0xFF; // A
+                // Loop count (0 = infinite)
+                view.setUint16(12, 0, true);
+
+                return chunk;
+            }
+
+            createANMFChunk(webpData, delay, isFirst) {
+                // Find the VP8/VP8L chunk in the WebP data
+                const frameData = this.extractFrameData(webpData);
+                
+                // ANMF chunk: 8 (header) + 16 (frame header) + frame data
+                const chunkSize = 16 + frameData.length;
+                const totalSize = 8 + chunkSize + (chunkSize % 2); // Pad to even
+                
+                const chunk = new Uint8Array(totalSize);
+                const view = new DataView(chunk.buffer);
+
+                let offset = 0;
+
+                // "ANMF"
+                chunk.set([0x41, 0x4E, 0x4D, 0x46], offset);
+                offset += 4;
+
+                // Chunk size
+                view.setUint32(offset, chunkSize + (chunkSize % 2), true);
+                offset += 4;
+
+                // Frame X (24 bits) - position / 2
+                chunk[offset] = 0;
+                chunk[offset + 1] = 0;
+                chunk[offset + 2] = 0;
+                offset += 3;
+
+                // Frame Y (24 bits)
+                chunk[offset] = 0;
+                chunk[offset + 1] = 0;
+                chunk[offset + 2] = 0;
+                offset += 3;
+
+                // Frame width - 1 (24 bits)
+                const w = this.width - 1;
+                chunk[offset] = w & 0xFF;
+                chunk[offset + 1] = (w >> 8) & 0xFF;
+                chunk[offset + 2] = (w >> 16) & 0xFF;
+                offset += 3;
+
+                // Frame height - 1 (24 bits)
+                const h = this.height - 1;
+                chunk[offset] = h & 0xFF;
+                chunk[offset + 1] = (h >> 8) & 0xFF;
+                chunk[offset + 2] = (h >> 16) & 0xFF;
+                offset += 3;
+
+                // Duration (24 bits) in milliseconds
+                const d = Math.round(delay);
+                chunk[offset] = d & 0xFF;
+                chunk[offset + 1] = (d >> 8) & 0xFF;
+                chunk[offset + 2] = (d >> 16) & 0xFF;
+                offset += 3;
+
+                // Flags: dispose = 0, blend = 0
+                chunk[offset] = 0;
+                offset += 1;
+
+                // Frame data
+                chunk.set(frameData, offset);
+
+                return chunk;
+            }
+
+            extractFrameData(webpData) {
+                // WebP format: RIFF....WEBP[chunks]
+                // We need to extract VP8/VP8L/VP8X chunk
+                
+                // Skip RIFF header (12 bytes)
+                let offset = 12;
+                
+                while (offset < webpData.length - 8) {
+                    const chunkId = String.fromCharCode(
+                        webpData[offset],
+                        webpData[offset + 1],
+                        webpData[offset + 2],
+                        webpData[offset + 3]
+                    );
+                    
+                    const chunkSize = webpData[offset + 4] |
+                                     (webpData[offset + 5] << 8) |
+                                     (webpData[offset + 6] << 16) |
+                                     (webpData[offset + 7] << 24);
+
+                    if (chunkId === 'VP8 ' || chunkId === 'VP8L') {
+                        // Return the entire chunk including header
+                        const totalChunkSize = 8 + chunkSize + (chunkSize % 2);
+                        return webpData.slice(offset, offset + totalChunkSize);
+                    }
+
+                    offset += 8 + chunkSize + (chunkSize % 2);
+                }
+
+                // If no VP8 chunk found, return original data minus RIFF header
+                return webpData.slice(12);
+            }
+        }
+
         // DOM Elements
+        const loadingLib = document.getElementById('loadingLib');
+        const mainContent = document.getElementById('mainContent');
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const videoPreview = document.getElementById('videoPreview');
@@ -407,7 +662,6 @@
         const webpInfo = document.getElementById('webpInfo');
         const conversionStats = document.getElementById('conversionStats');
 
-        // Settings
         const qualitySlider = document.getElementById('quality');
         const fpsSlider = document.getElementById('fps');
         const maxWidthInput = document.getElementById('maxWidth');
@@ -417,6 +671,25 @@
 
         let currentFile = null;
         let webpBlob = null;
+
+        // Initialize
+        function init() {
+            // Check for WebP support
+            const canvas = document.createElement('canvas');
+            canvas.width = 1;
+            canvas.height = 1;
+            const supported = canvas.toDataURL('image/webp').startsWith('data:image/webp');
+            
+            if (!supported) {
+                showError('Your browser does not support WebP encoding. Please use Chrome, Edge, or Firefox.');
+            }
+
+            loadingLib.style.display = 'none';
+            mainContent.style.display = 'block';
+        }
+
+        // Wait a moment then initialize
+        setTimeout(init, 500);
 
         // Event Listeners
         qualitySlider.addEventListener('input', () => {
@@ -441,9 +714,8 @@
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
             uploadArea.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFile(files[0]);
+            if (e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
             }
         });
 
@@ -457,28 +729,28 @@
         downloadBtn.addEventListener('click', downloadWebP);
 
         function showError(message) {
-            errorMessage.textContent = message;
+            errorMessage.textContent = '⚠️ ' + message;
             errorMessage.classList.add('active');
-            setTimeout(() => {
-                errorMessage.classList.remove('active');
-            }, 5000);
+        }
+
+        function hideError() {
+            errorMessage.classList.remove('active');
         }
 
         function formatBytes(bytes) {
-            if (bytes === 0) return '0 Bytes';
+            if (bytes === 0) return '0 B';
             const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const sizes = ['B', 'KB', 'MB', 'GB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
         function handleFile(file) {
-            // Reset UI
+            hideError();
             downloadSection.classList.remove('active');
             webpPreviewBox.style.display = 'none';
-            errorMessage.classList.remove('active');
+            progressSection.classList.remove('active');
 
-            // Validate file type
             if (!file.type.startsWith('video/')) {
                 showError('Please select a valid video file.');
                 return;
@@ -489,20 +761,24 @@
             videoPreview.src = url;
 
             videoPreview.onloadedmetadata = () => {
-                // Check duration
                 if (videoPreview.duration > 8) {
-                    showError('Video is too long. Maximum duration is 8 seconds. Your video is ' + 
-                              videoPreview.duration.toFixed(1) + ' seconds.');
+                    showError(`Video too long (${videoPreview.duration.toFixed(1)}s). Maximum is 8 seconds.`);
                     convertBtn.disabled = true;
+                    previewSection.classList.add('active');
+                    videoInfo.innerHTML = `
+                        <strong>${file.name}</strong><br>
+                        Size: ${formatBytes(file.size)}<br>
+                        Duration: ${videoPreview.duration.toFixed(2)}s ❌<br>
+                        Resolution: ${videoPreview.videoWidth}×${videoPreview.videoHeight}
+                    `;
                     return;
                 }
 
-                // Display info
                 videoInfo.innerHTML = `
-                    <strong>File:</strong> ${file.name}<br>
-                    <strong>Size:</strong> ${formatBytes(file.size)}<br>
-                    <strong>Duration:</strong> ${videoPreview.duration.toFixed(2)}s<br>
-                    <strong>Resolution:</strong> ${videoPreview.videoWidth} × ${videoPreview.videoHeight}
+                    <strong>${file.name}</strong><br>
+                    Size: ${formatBytes(file.size)}<br>
+                    Duration: ${videoPreview.duration.toFixed(2)}s<br>
+                    Resolution: ${videoPreview.videoWidth}×${videoPreview.videoHeight}
                 `;
 
                 previewSection.classList.add('active');
@@ -510,7 +786,7 @@
             };
 
             videoPreview.onerror = () => {
-                showError('Error loading video. Please try a different file.');
+                showError('Error loading video. Try a different file.');
             };
         }
 
@@ -526,29 +802,35 @@
             progressSection.classList.add('active');
             downloadSection.classList.remove('active');
             webpPreviewBox.style.display = 'none';
+            hideError();
 
             try {
-                webpBlob = await convertToWebP(videoPreview, quality, fps, maxWidth, maxHeight);
+                webpBlob = await convertToAnimatedWebP(videoPreview, quality, fps, maxWidth, maxHeight);
                 
-                // Show preview
                 const webpUrl = URL.createObjectURL(webpBlob);
                 webpPreview.src = webpUrl;
                 webpPreviewBox.style.display = 'block';
 
+                const savings = ((1 - webpBlob.size / currentFile.size) * 100);
+                const savingsText = savings > 0 ? 
+                    `${savings.toFixed(1)}% smaller` : 
+                    `${Math.abs(savings).toFixed(1)}% larger`;
+
                 webpInfo.innerHTML = `
-                    <strong>Size:</strong> ${formatBytes(webpBlob.size)}<br>
-                    <strong>Compression:</strong> ${((1 - webpBlob.size / currentFile.size) * 100).toFixed(1)}% smaller
+                    <strong>animated.webp</strong><br>
+                    Size: ${formatBytes(webpBlob.size)}<br>
+                    ${savingsText} than original
                 `;
 
                 conversionStats.innerHTML = `
-                    Original: ${formatBytes(currentFile.size)} → WebP: ${formatBytes(webpBlob.size)}<br>
-                    Saved: ${formatBytes(currentFile.size - webpBlob.size)} (${((1 - webpBlob.size / currentFile.size) * 100).toFixed(1)}%)
+                    ${formatBytes(currentFile.size)} → ${formatBytes(webpBlob.size)}
                 `;
 
                 downloadSection.classList.add('active');
                 progressSection.classList.remove('active');
 
             } catch (error) {
+                console.error('Conversion error:', error);
                 showError('Conversion failed: ' + error.message);
                 progressSection.classList.remove('active');
             }
@@ -556,211 +838,68 @@
             convertBtn.disabled = false;
         }
 
-        async function convertToWebP(video, quality, fps, maxWidth, maxHeight) {
-            return new Promise((resolve, reject) => {
-                // Calculate dimensions
-                let width = video.videoWidth;
-                let height = video.videoHeight;
+        async function convertToAnimatedWebP(video, quality, fps, maxWidth, maxHeight) {
+            // Calculate output dimensions
+            let width = video.videoWidth;
+            let height = video.videoHeight;
 
-                if (width > maxWidth) {
-                    height = Math.round(height * (maxWidth / width));
-                    width = maxWidth;
-                }
-                if (height > maxHeight) {
-                    width = Math.round(width * (maxHeight / height));
-                    height = maxHeight;
-                }
+            const scaleW = maxWidth / width;
+            const scaleH = maxHeight / height;
+            const scale = Math.min(scaleW, scaleH, 1);
 
-                // Ensure even dimensions
-                width = Math.floor(width / 2) * 2;
-                height = Math.floor(height / 2) * 2;
+            width = Math.floor(width * scale);
+            height = Math.floor(height * scale);
 
-                const canvas = document.createElement('canvas');
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
+            // Ensure even dimensions
+            width = Math.floor(width / 2) * 2;
+            height = Math.floor(height / 2) * 2;
 
-                const duration = video.duration;
-                const frameInterval = 1 / fps;
-                const totalFrames = Math.ceil(duration * fps);
-                
-                const frames = [];
-                let currentFrame = 0;
-
-                updateProgress(0, 'Extracting frames...');
-
-                video.currentTime = 0;
-
-                const extractFrame = () => {
-                    if (currentFrame >= totalFrames) {
-                        // All frames extracted, now create WebP
-                        updateProgress(50, 'Creating animated WebP...');
-                        createAnimatedWebP(frames, width, height, frameInterval * 1000, quality)
-                            .then(resolve)
-                            .catch(reject);
-                        return;
-                    }
-
-                    ctx.drawImage(video, 0, 0, width, height);
-                    
-                    canvas.toBlob((blob) => {
-                        if (blob) {
-                            frames.push(blob);
-                        }
-                        currentFrame++;
-                        updateProgress(
-                            Math.round((currentFrame / totalFrames) * 50),
-                            `Extracting frame ${currentFrame}/${totalFrames}...`
-                        );
-
-                        video.currentTime = Math.min(currentFrame * frameInterval, duration);
-                    }, 'image/webp', quality);
-                };
-
-                video.onseeked = extractFrame;
-                video.currentTime = 0;
-            });
-        }
-
-        async function createAnimatedWebP(frames, width, height, delay, quality) {
-            // Since browsers don't natively support creating animated WebP,
-            // we'll use a canvas-based approach to create a simple animated format
-            // For true animated WebP, we'd need a library like webp-wasm
-            
-            // Alternative: Create a GIF-like animation using canvas capture
-            // For this demo, we'll create a sequence that simulates animation
-            
-            updateProgress(60, 'Encoding WebP frames...');
-
-            // Use the WebCodecs API if available for better encoding
-            if ('VideoEncoder' in window) {
-                try {
-                    return await encodeWithWebCodecs(frames, width, height, delay, quality);
-                } catch (e) {
-                    console.log('WebCodecs failed, using fallback');
-                }
-            }
-
-            // Fallback: Return a single WebP (first frame) with info about animation
-            // In production, you'd want to use a proper WebP encoder library
-            updateProgress(80, 'Finalizing...');
-            
-            // Create animated WebP using manual encoding
-            return await createAnimatedWebPManual(frames, width, height, delay, quality);
-        }
-
-        async function createAnimatedWebPManual(frames, width, height, delay, quality) {
-            // This creates a simple animated WebP-like output
-            // For full animated WebP support, consider using libraries like:
-            // - libwebp compiled to WASM
-            // - gif.js (for GIF alternative)
-            
             const canvas = document.createElement('canvas');
             canvas.width = width;
             canvas.height = height;
             const ctx = canvas.getContext('2d');
+
+            const duration = video.duration;
+            const frameDelay = 1000 / fps;
+            const totalFrames = Math.ceil(duration * fps);
+
+            updateProgress(0, 'Extracting frames...');
+
+            // Create encoder
+            const encoder = new AnimatedWebPEncoder(width, height, { quality });
+
+            // Extract frames
+            video.currentTime = 0;
             
-            // For browsers that support it, we can use MediaRecorder
-            if (typeof MediaRecorder !== 'undefined') {
-                try {
-                    const stream = canvas.captureStream(30);
-                    const recorder = new MediaRecorder(stream, {
-                        mimeType: 'video/webm;codecs=vp9',
-                        videoBitsPerSecond: Math.round(quality * 5000000)
-                    });
-                    
-                    const chunks = [];
-                    recorder.ondataavailable = (e) => chunks.push(e.data);
-                    
-                    return new Promise((resolve, reject) => {
-                        recorder.onstop = () => {
-                            const blob = new Blob(chunks, { type: 'video/webm' });
-                            // Note: This creates WebM, not WebP
-                            // For true animated WebP, use a specialized library
-                            resolve(blob);
-                        };
-                        
-                        recorder.start();
-                        
-                        let frameIndex = 0;
-                        const playFrames = async () => {
-                            if (frameIndex >= frames.length) {
-                                recorder.stop();
-                                updateProgress(100, 'Complete!');
-                                return;
-                            }
-                            
-                            const img = new Image();
-                            img.onload = () => {
-                                ctx.clearRect(0, 0, width, height);
-                                ctx.drawImage(img, 0, 0);
-                                frameIndex++;
-                                updateProgress(
-                                    80 + Math.round((frameIndex / frames.length) * 20),
-                                    'Encoding...'
-                                );
-                                setTimeout(playFrames, delay);
-                            };
-                            img.src = URL.createObjectURL(frames[frameIndex]);
-                        };
-                        
-                        playFrames();
-                    });
-                } catch (e) {
-                    console.error('MediaRecorder failed:', e);
-                }
+            for (let i = 0; i < totalFrames; i++) {
+                await seekVideo(video, i / fps);
+                
+                ctx.drawImage(video, 0, 0, width, height);
+                encoder.addFrame(canvas, frameDelay);
+
+                const progress = Math.round(((i + 1) / totalFrames) * 80);
+                updateProgress(progress, `Extracting frame ${i + 1}/${totalFrames}...`);
             }
-            
-            // Ultimate fallback: return first frame as static WebP
+
+            updateProgress(85, 'Encoding animated WebP...');
+
+            const blob = await encoder.render();
+
             updateProgress(100, 'Complete!');
-            return frames[0];
+
+            return blob;
         }
 
-        async function encodeWithWebCodecs(frames, width, height, delay, quality) {
-            // WebCodecs API for more efficient encoding
-            const config = {
-                codec: 'vp09.00.10.08',
-                width: width,
-                height: height,
-                bitrate: Math.round(quality * 5000000),
-                framerate: 1000 / delay
-            };
-
-            const chunks = [];
-            
-            const encoder = new VideoEncoder({
-                output: (chunk, meta) => {
-                    const buffer = new ArrayBuffer(chunk.byteLength);
-                    chunk.copyTo(buffer);
-                    chunks.push(buffer);
-                },
-                error: (e) => console.error('Encoder error:', e)
+        function seekVideo(video, time) {
+            return new Promise((resolve) => {
+                const onSeeked = () => {
+                    video.removeEventListener('seeked', onSeeked);
+                    // Small delay to ensure frame is rendered
+                    setTimeout(resolve, 10);
+                };
+                video.addEventListener('seeked', onSeeked);
+                video.currentTime = Math.min(time, video.duration);
             });
-
-            encoder.configure(config);
-
-            for (let i = 0; i < frames.length; i++) {
-                const img = await createImageBitmap(frames[i]);
-                const frame = new VideoFrame(img, {
-                    timestamp: i * delay * 1000,
-                    duration: delay * 1000
-                });
-                encoder.encode(frame);
-                frame.close();
-                
-                updateProgress(
-                    60 + Math.round((i / frames.length) * 40),
-                    `Encoding frame ${i + 1}/${frames.length}...`
-                );
-            }
-
-            await encoder.flush();
-            encoder.close();
-
-            updateProgress(100, 'Complete!');
-            
-            // Create WebM container (WebP animation requires specific muxing)
-            return new Blob(chunks, { type: 'video/webm' });
         }
 
         function updateProgress(percent, status) {
@@ -782,7 +921,7 @@
             a.click();
             document.body.removeChild(a);
             
-            URL.revokeObjectURL(url);
+            setTimeout(() => URL.revokeObjectURL(url), 100);
         }
     </script>
 </body>
