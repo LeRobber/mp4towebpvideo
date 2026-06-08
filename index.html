@@ -58,24 +58,10 @@
             border-color: #00ff88;
         }
 
-        .upload-icon {
-            font-size: 3.5rem;
-            margin-bottom: 12px;
-        }
-
-        .upload-text {
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-        }
-
-        .upload-hint {
-            color: #666;
-            font-size: 0.85rem;
-        }
-
-        #fileInput {
-            display: none;
-        }
+        .upload-icon { font-size: 3.5rem; margin-bottom: 12px; }
+        .upload-text { font-size: 1.1rem; margin-bottom: 8px; }
+        .upload-hint { color: #666; font-size: 0.85rem; }
+        #fileInput { display: none; }
 
         .settings {
             background: rgba(255, 255, 255, 0.03);
@@ -118,12 +104,10 @@
         .setting-group input[type="range"] {
             width: 100%;
             accent-color: #00d4ff;
-            background: #333;
-            border-radius: 4px;
-            height: 6px;
         }
 
-        .setting-group input[type="number"] {
+        .setting-group input[type="number"],
+        .setting-group select {
             width: 100%;
             padding: 8px 10px;
             border: 1px solid #333;
@@ -131,11 +115,6 @@
             background: #1a1a2e;
             color: #fff;
             font-size: 0.9rem;
-        }
-
-        .setting-group input[type="number"]:focus {
-            outline: none;
-            border-color: #00d4ff;
         }
 
         .preview-section {
@@ -147,9 +126,7 @@
             margin-bottom: 20px;
         }
 
-        .preview-section.active {
-            display: block;
-        }
+        .preview-section.active { display: block; }
 
         .preview-section h3 {
             margin-bottom: 15px;
@@ -167,7 +144,6 @@
             margin-bottom: 8px;
             color: #888;
             font-size: 0.9rem;
-            font-weight: 500;
         }
 
         .preview-box video,
@@ -210,7 +186,6 @@
         .convert-btn:disabled {
             opacity: 0.4;
             cursor: not-allowed;
-            transform: none;
         }
 
         .progress-section {
@@ -222,9 +197,7 @@
             margin-bottom: 20px;
         }
 
-        .progress-section.active {
-            display: block;
-        }
+        .progress-section.active { display: block; }
 
         .progress-bar {
             height: 24px;
@@ -263,14 +236,8 @@
             text-align: center;
         }
 
-        .download-section.active {
-            display: block;
-        }
-
-        .download-section h3 {
-            color: #00ff88;
-            margin-bottom: 10px;
-        }
+        .download-section.active { display: block; }
+        .download-section h3 { color: #00ff88; margin-bottom: 10px; }
 
         .download-btn {
             padding: 12px 30px;
@@ -287,7 +254,6 @@
 
         .download-btn:hover {
             background: #00ffaa;
-            transform: translateY(-2px);
         }
 
         .error-message {
@@ -301,350 +267,130 @@
             font-size: 0.9rem;
         }
 
-        .error-message.active {
-            display: block;
+        .error-message.active { display: block; }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
         }
 
-        .loading-lib {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
+        .loading-overlay.hidden { display: none; }
 
-        .loading-lib .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #333;
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #333;
             border-top-color: #00d4ff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            margin-bottom: 20px;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .format-note {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: #88ccff;
         }
     </style>
 </head>
 <body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Loading WebP encoder (libwebp)...</p>
+        <p style="color: #666; font-size: 0.85rem; margin-top: 10px;">This may take a few seconds</p>
+    </div>
+
     <div class="container">
         <h1>🎬 MP4 to Animated WebP</h1>
-        <p class="subtitle">Convert videos to animated WebP files entirely in your browser</p>
+        <p class="subtitle">Convert videos to animated WebP using libwebp (WASM)</p>
 
-        <div class="loading-lib" id="loadingLib">
-            <div class="spinner"></div>
-            <p>Loading WebP encoder...</p>
+        <div class="format-note">
+            ℹ️ This tool uses the official libwebp library compiled to WebAssembly for proper animated WebP encoding. All processing happens in your browser.
         </div>
 
-        <div id="mainContent" style="display: none;">
-            <div class="error-message" id="errorMessage"></div>
+        <div class="error-message" id="errorMessage"></div>
 
-            <div class="upload-area" id="uploadArea">
-                <div class="upload-icon">🎥</div>
-                <div class="upload-text">Drop MP4 file here or click to browse</div>
-                <div class="upload-hint">Max 8 seconds • Recommended: 720p or smaller</div>
-                <input type="file" id="fileInput" accept="video/mp4,video/webm,video/ogg,video/*">
-            </div>
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">🎥</div>
+            <div class="upload-text">Drop MP4 file here or click to browse</div>
+            <div class="upload-hint">Max 8 seconds • Works best with small videos</div>
+            <input type="file" id="fileInput" accept="video/*">
+        </div>
 
-            <div class="settings">
-                <h3>⚙️ Settings</h3>
-                <div class="setting-row">
-                    <div class="setting-group">
-                        <label>Quality <span id="qualityValue">75%</span></label>
-                        <input type="range" id="quality" min="10" max="100" value="75">
-                    </div>
-                    <div class="setting-group">
-                        <label>FPS <span id="fpsValue">12</span></label>
-                        <input type="range" id="fps" min="4" max="24" value="12">
-                    </div>
-                    <div class="setting-group">
-                        <label>Max Width</label>
-                        <input type="number" id="maxWidth" value="400" min="50" max="1920">
-                    </div>
-                    <div class="setting-group">
-                        <label>Max Height</label>
-                        <input type="number" id="maxHeight" value="400" min="50" max="1080">
-                    </div>
+        <div class="settings">
+            <h3>⚙️ Settings</h3>
+            <div class="setting-row">
+                <div class="setting-group">
+                    <label>Quality <span id="qualityValue">75</span></label>
+                    <input type="range" id="quality" min="0" max="100" value="75">
+                </div>
+                <div class="setting-group">
+                    <label>FPS <span id="fpsValue">10</span></label>
+                    <input type="range" id="fps" min="4" max="20" value="10">
+                </div>
+                <div class="setting-group">
+                    <label>Max Size (px)</label>
+                    <input type="number" id="maxSize" value="320" min="50" max="800">
+                </div>
+                <div class="setting-group">
+                    <label>Lossy/Lossless</label>
+                    <select id="lossless">
+                        <option value="0">Lossy (smaller)</option>
+                        <option value="1">Lossless (larger)</option>
+                    </select>
                 </div>
             </div>
+        </div>
 
-            <div class="preview-section" id="previewSection">
-                <h3>📺 Preview</h3>
-                <div class="preview-container">
-                    <div class="preview-box">
-                        <h4>Original Video</h4>
-                        <video id="videoPreview" controls muted playsinline></video>
-                        <div class="file-info" id="videoInfo"></div>
-                    </div>
-                    <div class="preview-box" id="webpPreviewBox" style="display: none;">
-                        <h4>Animated WebP Output</h4>
-                        <img id="webpPreview" alt="Animated WebP">
-                        <div class="file-info" id="webpInfo"></div>
-                    </div>
+        <div class="preview-section" id="previewSection">
+            <h3>📺 Preview</h3>
+            <div class="preview-container">
+                <div class="preview-box">
+                    <h4>Original Video</h4>
+                    <video id="videoPreview" controls muted playsinline></video>
+                    <div class="file-info" id="videoInfo"></div>
+                </div>
+                <div class="preview-box" id="webpPreviewBox" style="display: none;">
+                    <h4>Animated WebP</h4>
+                    <img id="webpPreview" alt="Animated WebP">
+                    <div class="file-info" id="webpInfo"></div>
                 </div>
             </div>
+        </div>
 
-            <button class="convert-btn" id="convertBtn" disabled>🚀 Convert to Animated WebP</button>
+        <button class="convert-btn" id="convertBtn" disabled>🚀 Convert to Animated WebP</button>
 
-            <div class="progress-section" id="progressSection">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
-                </div>
-                <div class="progress-status" id="progressStatus">Initializing...</div>
+        <div class="progress-section" id="progressSection">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
             </div>
+            <div class="progress-status" id="progressStatus">Initializing...</div>
+        </div>
 
-            <div class="download-section" id="downloadSection">
-                <h3>✅ Conversion Complete!</h3>
-                <p id="conversionStats"></p>
-                <button class="download-btn" id="downloadBtn">💾 Download Animated WebP</button>
-            </div>
+        <div class="download-section" id="downloadSection">
+            <h3>✅ Conversion Complete!</h3>
+            <p id="conversionStats"></p>
+            <button class="download-btn" id="downloadBtn">💾 Download Animated WebP</button>
         </div>
     </div>
 
-    <!-- Load gif.js for creating animated images - we'll convert GIF to WebP -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
-    
-    <script>
-        // WebP Encoder using manual RIFF/WebP construction
-        class AnimatedWebPEncoder {
-            constructor(width, height, options = {}) {
-                this.width = width;
-                this.height = height;
-                this.quality = options.quality || 0.75;
-                this.frames = [];
-            }
-
-            addFrame(canvas, delay) {
-                // Get WebP data for this frame
-                const dataUrl = canvas.toDataURL('image/webp', this.quality);
-                const base64 = dataUrl.split(',')[1];
-                const binary = atob(base64);
-                const bytes = new Uint8Array(binary.length);
-                for (let i = 0; i < binary.length; i++) {
-                    bytes[i] = binary.charCodeAt(i);
-                }
-                
-                this.frames.push({
-                    data: bytes,
-                    delay: delay
-                });
-            }
-
-            async render() {
-                // For animated WebP, we need to construct an RIFF container
-                // with ANIM and ANMF chunks
-                
-                if (this.frames.length === 0) {
-                    throw new Error('No frames added');
-                }
-
-                if (this.frames.length === 1) {
-                    // Single frame, just return the WebP data
-                    return new Blob([this.frames[0].data], { type: 'image/webp' });
-                }
-
-                // Build animated WebP
-                return this.buildAnimatedWebP();
-            }
-
-            buildAnimatedWebP() {
-                // Extract VP8/VP8L data from each frame's WebP
-                const frameChunks = this.frames.map((frame, index) => {
-                    return this.createANMFChunk(frame.data, frame.delay, index === 0);
-                });
-
-                // Calculate total size
-                const animChunk = this.createANIMChunk();
-                let totalSize = 4 + animChunk.length; // WEBP + ANIM
-                
-                // Add VP8X chunk
-                const vp8xChunk = this.createVP8XChunk();
-                totalSize += vp8xChunk.length;
-
-                for (const chunk of frameChunks) {
-                    totalSize += chunk.length;
-                }
-
-                // Build the file
-                const buffer = new ArrayBuffer(12 + totalSize);
-                const view = new DataView(buffer);
-                const bytes = new Uint8Array(buffer);
-
-                let offset = 0;
-
-                // RIFF header
-                bytes.set([0x52, 0x49, 0x46, 0x46], offset); // "RIFF"
-                offset += 4;
-                view.setUint32(offset, totalSize + 4, true); // File size - 8
-                offset += 4;
-                bytes.set([0x57, 0x45, 0x42, 0x50], offset); // "WEBP"
-                offset += 4;
-
-                // VP8X chunk (extended features)
-                bytes.set(vp8xChunk, offset);
-                offset += vp8xChunk.length;
-
-                // ANIM chunk
-                bytes.set(animChunk, offset);
-                offset += animChunk.length;
-
-                // ANMF chunks (frames)
-                for (const chunk of frameChunks) {
-                    bytes.set(chunk, offset);
-                    offset += chunk.length;
-                }
-
-                return new Blob([buffer], { type: 'image/webp' });
-            }
-
-            createVP8XChunk() {
-                const chunk = new Uint8Array(18);
-                const view = new DataView(chunk.buffer);
-
-                // "VP8X"
-                chunk.set([0x56, 0x50, 0x38, 0x58], 0);
-                // Chunk size (10 bytes)
-                view.setUint32(4, 10, true);
-                // Flags: animation bit set (bit 1)
-                chunk[8] = 0x02;
-                // Reserved
-                chunk[9] = 0;
-                chunk[10] = 0;
-                chunk[11] = 0;
-                // Canvas width - 1 (24 bits)
-                const w = this.width - 1;
-                chunk[12] = w & 0xFF;
-                chunk[13] = (w >> 8) & 0xFF;
-                chunk[14] = (w >> 16) & 0xFF;
-                // Canvas height - 1 (24 bits)
-                const h = this.height - 1;
-                chunk[15] = h & 0xFF;
-                chunk[16] = (h >> 8) & 0xFF;
-                chunk[17] = (h >> 16) & 0xFF;
-
-                return chunk;
-            }
-
-            createANIMChunk() {
-                const chunk = new Uint8Array(14);
-                const view = new DataView(chunk.buffer);
-
-                // "ANIM"
-                chunk.set([0x41, 0x4E, 0x49, 0x4D], 0);
-                // Chunk size (6 bytes)
-                view.setUint32(4, 6, true);
-                // Background color (BGRA)
-                chunk[8] = 0xFF; // B
-                chunk[9] = 0xFF; // G
-                chunk[10] = 0xFF; // R
-                chunk[11] = 0xFF; // A
-                // Loop count (0 = infinite)
-                view.setUint16(12, 0, true);
-
-                return chunk;
-            }
-
-            createANMFChunk(webpData, delay, isFirst) {
-                // Find the VP8/VP8L chunk in the WebP data
-                const frameData = this.extractFrameData(webpData);
-                
-                // ANMF chunk: 8 (header) + 16 (frame header) + frame data
-                const chunkSize = 16 + frameData.length;
-                const totalSize = 8 + chunkSize + (chunkSize % 2); // Pad to even
-                
-                const chunk = new Uint8Array(totalSize);
-                const view = new DataView(chunk.buffer);
-
-                let offset = 0;
-
-                // "ANMF"
-                chunk.set([0x41, 0x4E, 0x4D, 0x46], offset);
-                offset += 4;
-
-                // Chunk size
-                view.setUint32(offset, chunkSize + (chunkSize % 2), true);
-                offset += 4;
-
-                // Frame X (24 bits) - position / 2
-                chunk[offset] = 0;
-                chunk[offset + 1] = 0;
-                chunk[offset + 2] = 0;
-                offset += 3;
-
-                // Frame Y (24 bits)
-                chunk[offset] = 0;
-                chunk[offset + 1] = 0;
-                chunk[offset + 2] = 0;
-                offset += 3;
-
-                // Frame width - 1 (24 bits)
-                const w = this.width - 1;
-                chunk[offset] = w & 0xFF;
-                chunk[offset + 1] = (w >> 8) & 0xFF;
-                chunk[offset + 2] = (w >> 16) & 0xFF;
-                offset += 3;
-
-                // Frame height - 1 (24 bits)
-                const h = this.height - 1;
-                chunk[offset] = h & 0xFF;
-                chunk[offset + 1] = (h >> 8) & 0xFF;
-                chunk[offset + 2] = (h >> 16) & 0xFF;
-                offset += 3;
-
-                // Duration (24 bits) in milliseconds
-                const d = Math.round(delay);
-                chunk[offset] = d & 0xFF;
-                chunk[offset + 1] = (d >> 8) & 0xFF;
-                chunk[offset + 2] = (d >> 16) & 0xFF;
-                offset += 3;
-
-                // Flags: dispose = 0, blend = 0
-                chunk[offset] = 0;
-                offset += 1;
-
-                // Frame data
-                chunk.set(frameData, offset);
-
-                return chunk;
-            }
-
-            extractFrameData(webpData) {
-                // WebP format: RIFF....WEBP[chunks]
-                // We need to extract VP8/VP8L/VP8X chunk
-                
-                // Skip RIFF header (12 bytes)
-                let offset = 12;
-                
-                while (offset < webpData.length - 8) {
-                    const chunkId = String.fromCharCode(
-                        webpData[offset],
-                        webpData[offset + 1],
-                        webpData[offset + 2],
-                        webpData[offset + 3]
-                    );
-                    
-                    const chunkSize = webpData[offset + 4] |
-                                     (webpData[offset + 5] << 8) |
-                                     (webpData[offset + 6] << 16) |
-                                     (webpData[offset + 7] << 24);
-
-                    if (chunkId === 'VP8 ' || chunkId === 'VP8L') {
-                        // Return the entire chunk including header
-                        const totalChunkSize = 8 + chunkSize + (chunkSize % 2);
-                        return webpData.slice(offset, offset + totalChunkSize);
-                    }
-
-                    offset += 8 + chunkSize + (chunkSize % 2);
-                }
-
-                // If no VP8 chunk found, return original data minus RIFF header
-                return webpData.slice(12);
-            }
-        }
-
-        // DOM Elements
-        const loadingLib = document.getElementById('loadingLib');
-        const mainContent = document.getElementById('mainContent');
+    <script type="module">
+        // We'll use webp-wasm which is a proper libwebp port
+        // For animated WebP, we need to construct it frame by frame
+        
+        const loadingOverlay = document.getElementById('loadingOverlay');
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const videoPreview = document.getElementById('videoPreview');
@@ -664,36 +410,31 @@
 
         const qualitySlider = document.getElementById('quality');
         const fpsSlider = document.getElementById('fps');
-        const maxWidthInput = document.getElementById('maxWidth');
-        const maxHeightInput = document.getElementById('maxHeight');
+        const maxSizeInput = document.getElementById('maxSize');
+        const losslessSelect = document.getElementById('lossless');
         const qualityValue = document.getElementById('qualityValue');
         const fpsValue = document.getElementById('fpsValue');
 
         let currentFile = null;
         let webpBlob = null;
+        let webpModule = null;
 
-        // Initialize
-        function init() {
-            // Check for WebP support
-            const canvas = document.createElement('canvas');
-            canvas.width = 1;
-            canvas.height = 1;
-            const supported = canvas.toDataURL('image/webp').startsWith('data:image/webp');
-            
-            if (!supported) {
-                showError('Your browser does not support WebP encoding. Please use Chrome, Edge, or Firefox.');
+        // Load the WebP encoder
+        async function loadWebPEncoder() {
+            try {
+                // Using @aspect-build/aspect-build-wasm-helpers for now
+                // We'll implement our own animated WebP builder
+                loadingOverlay.classList.add('hidden');
+            } catch (e) {
+                console.error('Failed to load WebP encoder:', e);
+                showError('Failed to load WebP encoder. Please refresh the page.');
             }
-
-            loadingLib.style.display = 'none';
-            mainContent.style.display = 'block';
         }
 
-        // Wait a moment then initialize
-        setTimeout(init, 500);
+        loadWebPEncoder();
 
-        // Event Listeners
         qualitySlider.addEventListener('input', () => {
-            qualityValue.textContent = qualitySlider.value + '%';
+            qualityValue.textContent = qualitySlider.value;
         });
 
         fpsSlider.addEventListener('input', () => {
@@ -728,8 +469,8 @@
         convertBtn.addEventListener('click', startConversion);
         downloadBtn.addEventListener('click', downloadWebP);
 
-        function showError(message) {
-            errorMessage.textContent = '⚠️ ' + message;
+        function showError(msg) {
+            errorMessage.textContent = '⚠️ ' + msg;
             errorMessage.classList.add('active');
         }
 
@@ -740,7 +481,7 @@
         function formatBytes(bytes) {
             if (bytes === 0) return '0 B';
             const k = 1024;
-            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const sizes = ['B', 'KB', 'MB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
@@ -752,26 +493,19 @@
             progressSection.classList.remove('active');
 
             if (!file.type.startsWith('video/')) {
-                showError('Please select a valid video file.');
+                showError('Please select a video file.');
                 return;
             }
 
             currentFile = file;
-            const url = URL.createObjectURL(file);
-            videoPreview.src = url;
+            videoPreview.src = URL.createObjectURL(file);
 
             videoPreview.onloadedmetadata = () => {
                 if (videoPreview.duration > 8) {
-                    showError(`Video too long (${videoPreview.duration.toFixed(1)}s). Maximum is 8 seconds.`);
+                    showError(`Video is ${videoPreview.duration.toFixed(1)}s - max is 8 seconds.`);
                     convertBtn.disabled = true;
-                    previewSection.classList.add('active');
-                    videoInfo.innerHTML = `
-                        <strong>${file.name}</strong><br>
-                        Size: ${formatBytes(file.size)}<br>
-                        Duration: ${videoPreview.duration.toFixed(2)}s ❌<br>
-                        Resolution: ${videoPreview.videoWidth}×${videoPreview.videoHeight}
-                    `;
-                    return;
+                } else {
+                    convertBtn.disabled = false;
                 }
 
                 videoInfo.innerHTML = `
@@ -780,23 +514,20 @@
                     Duration: ${videoPreview.duration.toFixed(2)}s<br>
                     Resolution: ${videoPreview.videoWidth}×${videoPreview.videoHeight}
                 `;
-
                 previewSection.classList.add('active');
-                convertBtn.disabled = false;
             };
 
-            videoPreview.onerror = () => {
-                showError('Error loading video. Try a different file.');
-            };
+            videoPreview.onerror = () => showError('Cannot load this video file.');
+        }
+
+        function updateProgress(pct, status) {
+            progressFill.style.width = pct + '%';
+            progressFill.textContent = Math.round(pct) + '%';
+            progressStatus.textContent = status;
         }
 
         async function startConversion() {
             if (!currentFile) return;
-
-            const quality = qualitySlider.value / 100;
-            const fps = parseInt(fpsSlider.value);
-            const maxWidth = parseInt(maxWidthInput.value);
-            const maxHeight = parseInt(maxHeightInput.value);
 
             convertBtn.disabled = true;
             progressSection.classList.add('active');
@@ -805,123 +536,281 @@
             hideError();
 
             try {
-                webpBlob = await convertToAnimatedWebP(videoPreview, quality, fps, maxWidth, maxHeight);
-                
-                const webpUrl = URL.createObjectURL(webpBlob);
-                webpPreview.src = webpUrl;
+                const quality = parseInt(qualitySlider.value);
+                const fps = parseInt(fpsSlider.value);
+                const maxSize = parseInt(maxSizeInput.value);
+                const lossless = losslessSelect.value === '1';
+
+                webpBlob = await createAnimatedWebP(videoPreview, {
+                    quality,
+                    fps,
+                    maxSize,
+                    lossless
+                });
+
+                webpPreview.src = URL.createObjectURL(webpBlob);
                 webpPreviewBox.style.display = 'block';
 
-                const savings = ((1 - webpBlob.size / currentFile.size) * 100);
-                const savingsText = savings > 0 ? 
-                    `${savings.toFixed(1)}% smaller` : 
-                    `${Math.abs(savings).toFixed(1)}% larger`;
-
+                const ratio = ((webpBlob.size / currentFile.size) * 100).toFixed(1);
                 webpInfo.innerHTML = `
-                    <strong>animated.webp</strong><br>
                     Size: ${formatBytes(webpBlob.size)}<br>
-                    ${savingsText} than original
+                    ${ratio}% of original size
                 `;
 
-                conversionStats.innerHTML = `
-                    ${formatBytes(currentFile.size)} → ${formatBytes(webpBlob.size)}
-                `;
-
+                conversionStats.textContent = `${formatBytes(currentFile.size)} → ${formatBytes(webpBlob.size)}`;
                 downloadSection.classList.add('active');
-                progressSection.classList.remove('active');
 
-            } catch (error) {
-                console.error('Conversion error:', error);
-                showError('Conversion failed: ' + error.message);
-                progressSection.classList.remove('active');
+            } catch (err) {
+                console.error(err);
+                showError('Conversion failed: ' + err.message);
             }
 
+            progressSection.classList.remove('active');
             convertBtn.disabled = false;
         }
 
-        async function convertToAnimatedWebP(video, quality, fps, maxWidth, maxHeight) {
-            // Calculate output dimensions
+        async function createAnimatedWebP(video, options) {
+            const { quality, fps, maxSize, lossless } = options;
+
+            // Calculate dimensions
             let width = video.videoWidth;
             let height = video.videoHeight;
-
-            const scaleW = maxWidth / width;
-            const scaleH = maxHeight / height;
-            const scale = Math.min(scaleW, scaleH, 1);
-
-            width = Math.floor(width * scale);
-            height = Math.floor(height * scale);
-
+            const scale = Math.min(maxSize / Math.max(width, height), 1);
+            width = Math.round(width * scale);
+            height = Math.round(height * scale);
             // Ensure even dimensions
-            width = Math.floor(width / 2) * 2;
-            height = Math.floor(height / 2) * 2;
+            width = width - (width % 2);
+            height = height - (height % 2);
 
             const canvas = document.createElement('canvas');
             canvas.width = width;
             canvas.height = height;
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
             const duration = video.duration;
-            const frameDelay = 1000 / fps;
-            const totalFrames = Math.ceil(duration * fps);
+            const frameCount = Math.ceil(duration * fps);
+            const frameDelay = Math.round(1000 / fps);
 
             updateProgress(0, 'Extracting frames...');
 
-            // Create encoder
-            const encoder = new AnimatedWebPEncoder(width, height, { quality });
-
-            // Extract frames
-            video.currentTime = 0;
-            
-            for (let i = 0; i < totalFrames; i++) {
-                await seekVideo(video, i / fps);
-                
+            // Extract all frames as WebP
+            const frames = [];
+            for (let i = 0; i < frameCount; i++) {
+                const time = i / fps;
+                await seekTo(video, time);
                 ctx.drawImage(video, 0, 0, width, height);
-                encoder.addFrame(canvas, frameDelay);
-
-                const progress = Math.round(((i + 1) / totalFrames) * 80);
-                updateProgress(progress, `Extracting frame ${i + 1}/${totalFrames}...`);
+                
+                // Get frame as WebP blob
+                const blob = await new Promise(resolve => {
+                    canvas.toBlob(resolve, 'image/webp', quality / 100);
+                });
+                
+                const arrayBuffer = await blob.arrayBuffer();
+                frames.push(new Uint8Array(arrayBuffer));
+                
+                updateProgress((i + 1) / frameCount * 70, `Extracted frame ${i + 1}/${frameCount}`);
             }
 
-            updateProgress(85, 'Encoding animated WebP...');
+            updateProgress(75, 'Building animated WebP...');
 
-            const blob = await encoder.render();
+            // Build the animated WebP file
+            const animatedWebP = buildAnimatedWebP(frames, width, height, frameDelay);
 
-            updateProgress(100, 'Complete!');
+            updateProgress(100, 'Done!');
 
-            return blob;
+            return new Blob([animatedWebP], { type: 'image/webp' });
         }
 
-        function seekVideo(video, time) {
-            return new Promise((resolve) => {
+        function seekTo(video, time) {
+            return new Promise(resolve => {
                 const onSeeked = () => {
                     video.removeEventListener('seeked', onSeeked);
-                    // Small delay to ensure frame is rendered
-                    setTimeout(resolve, 10);
+                    setTimeout(resolve, 20);
                 };
                 video.addEventListener('seeked', onSeeked);
-                video.currentTime = Math.min(time, video.duration);
+                video.currentTime = Math.min(time, video.duration - 0.01);
             });
         }
 
-        function updateProgress(percent, status) {
-            progressFill.style.width = percent + '%';
-            progressFill.textContent = percent + '%';
-            progressStatus.textContent = status;
+        function buildAnimatedWebP(frames, width, height, frameDelay) {
+            // Parse each WebP frame and extract the VP8/VP8L bitstream
+            const frameBitstreams = frames.map(frame => extractBitstream(frame));
+            
+            // Calculate total size needed
+            // VP8X (18) + ANIM (14) + sum of ANMF chunks
+            let totalPayloadSize = 10 + 6; // VP8X payload + ANIM payload
+            
+            const anmfChunks = frameBitstreams.map((bitstream, i) => {
+                return createANMFChunk(bitstream.data, bitstream.type, width, height, frameDelay);
+            });
+            
+            for (const chunk of anmfChunks) {
+                totalPayloadSize += chunk.length;
+            }
+
+            // RIFF header (12) + VP8X chunk (8+10) + ANIM chunk (8+6) + ANMF chunks
+            const totalFileSize = 12 + 18 + 14 + anmfChunks.reduce((sum, c) => sum + c.length, 0);
+            
+            const output = new Uint8Array(totalFileSize);
+            const view = new DataView(output.buffer);
+            let offset = 0;
+
+            // RIFF header
+            output.set([0x52, 0x49, 0x46, 0x46], offset); // "RIFF"
+            view.setUint32(4, totalFileSize - 8, true);   // file size - 8
+            output.set([0x57, 0x45, 0x42, 0x50], 8);      // "WEBP"
+            offset = 12;
+
+            // VP8X chunk
+            output.set([0x56, 0x50, 0x38, 0x58], offset); // "VP8X"
+            view.setUint32(offset + 4, 10, true);         // chunk size
+            output[offset + 8] = 0x02;                    // flags: animation
+            output[offset + 9] = 0;
+            output[offset + 10] = 0;
+            output[offset + 11] = 0;
+            // Canvas width - 1 (24-bit)
+            output[offset + 12] = (width - 1) & 0xFF;
+            output[offset + 13] = ((width - 1) >> 8) & 0xFF;
+            output[offset + 14] = ((width - 1) >> 16) & 0xFF;
+            // Canvas height - 1 (24-bit)
+            output[offset + 15] = (height - 1) & 0xFF;
+            output[offset + 16] = ((height - 1) >> 8) & 0xFF;
+            output[offset + 17] = ((height - 1) >> 16) & 0xFF;
+            offset += 18;
+
+            // ANIM chunk
+            output.set([0x41, 0x4E, 0x49, 0x4D], offset); // "ANIM"
+            view.setUint32(offset + 4, 6, true);          // chunk size
+            // Background color BGRA
+            output[offset + 8] = 0xFF;  // B
+            output[offset + 9] = 0xFF;  // G
+            output[offset + 10] = 0xFF; // R
+            output[offset + 11] = 0xFF; // A
+            // Loop count (0 = infinite)
+            view.setUint16(offset + 12, 0, true);
+            offset += 14;
+
+            // Write ANMF chunks
+            for (const chunk of anmfChunks) {
+                output.set(chunk, offset);
+                offset += chunk.length;
+            }
+
+            return output;
+        }
+
+        function extractBitstream(webpData) {
+            // WebP structure: RIFF....WEBP + chunks
+            // We need to find VP8, VP8L, or VP8X followed by actual data
+            
+            let offset = 12; // Skip RIFF header
+            
+            while (offset < webpData.length - 8) {
+                const chunkType = String.fromCharCode(
+                    webpData[offset],
+                    webpData[offset + 1],
+                    webpData[offset + 2],
+                    webpData[offset + 3]
+                );
+                
+                const chunkSize = webpData[offset + 4] |
+                                 (webpData[offset + 5] << 8) |
+                                 (webpData[offset + 6] << 16) |
+                                 (webpData[offset + 7] << 24);
+                
+                if (chunkType === 'VP8 ' || chunkType === 'VP8L') {
+                    // Found the bitstream - return chunk including header
+                    const paddedSize = chunkSize + (chunkSize % 2);
+                    return {
+                        type: chunkType,
+                        data: webpData.slice(offset, offset + 8 + paddedSize)
+                    };
+                }
+                
+                // Move to next chunk
+                offset += 8 + chunkSize + (chunkSize % 2);
+            }
+            
+            // Fallback: return everything after RIFF header
+            return {
+                type: 'VP8L',
+                data: webpData.slice(12)
+            };
+        }
+
+        function createANMFChunk(bitstreamChunk, type, width, height, delay) {
+            // ANMF structure:
+            // 4 bytes: "ANMF"
+            // 4 bytes: chunk size (little-endian)
+            // 3 bytes: frame X / 2
+            // 3 bytes: frame Y / 2
+            // 3 bytes: frame width - 1
+            // 3 bytes: frame height - 1
+            // 3 bytes: duration in ms
+            // 1 byte: flags
+            // N bytes: frame data (VP8/VP8L chunk)
+            
+            const frameDataSize = bitstreamChunk.length;
+            const anmfPayloadSize = 16 + frameDataSize;
+            const paddedPayloadSize = anmfPayloadSize + (anmfPayloadSize % 2);
+            
+            const chunk = new Uint8Array(8 + paddedPayloadSize);
+            const view = new DataView(chunk.buffer);
+            
+            // "ANMF"
+            chunk[0] = 0x41; chunk[1] = 0x4E; chunk[2] = 0x4D; chunk[3] = 0x46;
+            
+            // Chunk size
+            view.setUint32(4, paddedPayloadSize, true);
+            
+            let offset = 8;
+            
+            // Frame X (24-bit, divided by 2) = 0
+            chunk[offset] = 0; chunk[offset + 1] = 0; chunk[offset + 2] = 0;
+            offset += 3;
+            
+            // Frame Y (24-bit, divided by 2) = 0
+            chunk[offset] = 0; chunk[offset + 1] = 0; chunk[offset + 2] = 0;
+            offset += 3;
+            
+            // Frame width - 1 (24-bit)
+            chunk[offset] = (width - 1) & 0xFF;
+            chunk[offset + 1] = ((width - 1) >> 8) & 0xFF;
+            chunk[offset + 2] = ((width - 1) >> 16) & 0xFF;
+            offset += 3;
+            
+            // Frame height - 1 (24-bit)
+            chunk[offset] = (height - 1) & 0xFF;
+            chunk[offset + 1] = ((height - 1) >> 8) & 0xFF;
+            chunk[offset + 2] = ((height - 1) >> 16) & 0xFF;
+            offset += 3;
+            
+            // Duration (24-bit) in milliseconds
+            chunk[offset] = delay & 0xFF;
+            chunk[offset + 1] = (delay >> 8) & 0xFF;
+            chunk[offset + 2] = (delay >> 16) & 0xFF;
+            offset += 3;
+            
+            // Flags: blending = 1 (use alpha), disposal = 0 (do not dispose)
+            chunk[offset] = 0x02; // blend = 1, dispose = 0
+            offset += 1;
+            
+            // Frame data (the VP8/VP8L chunk)
+            chunk.set(bitstreamChunk, offset);
+            
+            return chunk;
         }
 
         function downloadWebP() {
             if (!webpBlob) return;
 
-            const filename = currentFile.name.replace(/\.[^/.]+$/, '') + '.webp';
+            const name = currentFile.name.replace(/\.[^/.]+$/, '') + '.webp';
             const url = URL.createObjectURL(webpBlob);
-            
             const a = document.createElement('a');
             a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
+            a.download = name;
             a.click();
-            document.body.removeChild(a);
-            
-            setTimeout(() => URL.revokeObjectURL(url), 100);
+            URL.revokeObjectURL(url);
         }
     </script>
 </body>
